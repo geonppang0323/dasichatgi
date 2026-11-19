@@ -19,6 +19,7 @@ function buildPrompt(text) {
 - type은 다음 중 하나: ${types}
 - color는 다음 중 하나 또는 "": ${COLORS.join(", ")}
 - region은 다음 중 하나 또는 "": ${regions}. 역 이름·동네 이름이면 해당 시도를 골라 (예: 서면역 → LCT000, 사상 → LCT000).
+- 버스·기차·비행기로 여러 지역을 오가다 잃어버렸거나 지역이 두 곳 이상 나오면 region은 ""(전국)로 두고 place에 "부산→서울"처럼 적어.
 - days는 "어제"면 2, "오늘"이면 1, "지난주"면 10처럼 여유를 조금 둬.
 사용자 문장: """${text}"""`;
 }
@@ -98,10 +99,25 @@ function ruleParse(text) {
   else if (/어제/.test(t)) days = 2;
   else if (/지난\s*주|저번\s*주/.test(t)) days = 10;
   else if (/지난\s*달|저번\s*달|한\s*달/.test(t)) days = 30;
-  let region = "", place = "";
+  // 문장에 나온 지역을 순서대로 모두 찾는다
+  const found = [];
   for (const [re, code] of PLACE_REGION) {
-    const m = t.match(re);
-    if (m) { region = code; place = (t.slice(m.index).match(/^\S+?(역|동|구|시)?(?=에서|에|\s|$)/) || [m[0]])[0]; break; }
+    const g = new RegExp(re.source, "g");
+    let m;
+    while ((m = g.exec(t))) {
+      const next = t.slice(m.index + m[0].length).match(/^(역|공항|터미널)/);
+      const name = m[0] + (next ? next[0] : "");
+      found.push({ code, name, at: m.index });
+    }
+  }
+  found.sort((a, b) => a.at - b.at);
+  const codes = [...new Set(found.map((f) => f.code))];
+  let region = "", place = "";
+  if (codes.length === 1) { region = codes[0]; place = found[0].name; }
+  else if (codes.length > 1) {
+    // 여러 지역을 오갔으면 어디서 잃어버렸는지 모르므로 전국으로
+    region = "";
+    place = codes.map((c) => found.find((f) => f.code === c).name).join("→");
   }
   return { type, words, color, days, region, place };
 }
