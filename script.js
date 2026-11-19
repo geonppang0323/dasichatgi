@@ -78,6 +78,11 @@ function renderDays() {
 function renderSelects() {
   $("region").innerHTML = `<option value="">전국</option>` + REGION_GROUPS.map(([g, list]) =>
     `<optgroup label="${g}">${list.map(([c, n]) => `<option value="${c}">${n}</option>`).join("")}</optgroup>`).join("");
+  // 문장 검색으로 여러 지역이 정해지면 목록에 임시 항목으로 보여준다
+  if (state.region.includes(",")) {
+    const label = state.region.split(",").map(regionName).join(" + ");
+    $("region").insertAdjacentHTML("afterbegin", `<option value="${state.region}">${esc(label)}</option>`);
+  }
   $("region").value = state.region;
   $("color").innerHTML = `<option value="">상관없음</option>` + COLORS.map((c) => `<option>${c}</option>`).join("");
   $("color").value = state.color;
@@ -143,7 +148,7 @@ function nearestDays(d) {
 }
 
 function showAiChips(d) {
-  const region = REGIONS.find(([c]) => c === d.region)?.[1] || "전국";
+  const region = d.region ? d.region.split(",").map(regionName).join(" + ") : "전국";
   const chips = [
     `물건: ${NAME[d.type] || "기타"}`,
     d.words?.length ? `이름: ${d.words.join(", ")}` : null,
@@ -325,6 +330,10 @@ function itemCard(it) {
         <div class="chips">${chips}</div>
       </div>
     </button>`;
+}
+
+function regionName(code) {
+  return REGIONS.find(([c]) => c === code)?.[1] || code;
 }
 
 function emptyState() {
