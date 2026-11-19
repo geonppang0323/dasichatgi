@@ -1,4 +1,5 @@
 // GET /api/search?type=earphone&words=에어팟&color=흰색&days=7&region=LCT000&widen=1
+// region은 "LCR000,LCT000"처럼 여러 개(최대 3)도 가능
 import {
   ENDPOINTS, REGIONS, TYPES, CATEGORY_NAMES, callApi, ymd, daysSince, scoreItem, cached,
 } from "./_lib.js";
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
     const q = req.query || {};
     const type = TYPES[q.type] || TYPES.etc;
     const days = Math.min(Math.max(parseInt(q.days || "7", 10) || 7, 0), 30);
-    const region = REGIONS[q.region] ? q.region : "";
+    const regions = [...new Set(String(q.region || "").split(",").filter((r) => REGIONS[r]))].slice(0, 3);
     const color = (q.color || "").trim();
     const widen = q.widen !== "0";
     const extraWords = (q.words || "").split(/[,\s]+/).map((w) => w.trim()).filter((w) => w.length >= 1);
@@ -40,16 +41,17 @@ export default async function handler(req, res) {
     const params = {
       start: ymd(new Date(now.getTime() - days * 86400000)),
       end: ymd(now),
-      region,
     };
 
     const cats = widen ? [...type.primary, ...type.related] : type.primary;
     const jobs = [];
-    for (const source of ["police", "portal"]) {
-      for (const cat of cats) jobs.push({ source, cat });
+    for (const region of regions.length ? regions : [""]) {
+      for (const source of ["police", "portal"]) {
+        for (const cat of cats) jobs.push({ source, cat, region });
+      }
     }
 
-    const settled = await Promise.allSettled(jobs.map((j) => fetchList(j.source, j.cat, params)));
+    const settled = await Promise.allSettled(jobs.map((j) => fetchList(j.source, j.cat, { ...params, region: j.region })));
 
     const errors = [];
     const truncated = [];
@@ -60,7 +62,8 @@ export default async function handler(req, res) {
       const { source, cat } = jobs[i];
       if (r.status === "rejected") {
         console.error(`[search] ${source} ${cat} 실패:`, r.reason?.message || r.reason);
-        errors.push(`${source === "police" ? "경찰서" : "지하철·상점 등 기관"} 보관 ${CATEGORY_NAMES[cat] || cat}`);
+        const where = regions.length > 1 ? `${REGIONS[jobs[i].region]} ` : "";
+        errors.push(`${where}${source === "police" ? "경찰서" : "지하철·상점 등 기관"} 보관 ${CATEGORY_NAMES[cat] || cat}`);
         return;
       }
       if (r.value.total > MAX_ROWS) truncated.push(`${ENDPOINTS[source].label} ${CATEGORY_NAMES[cat]}`);
@@ -109,7 +112,7 @@ export default async function handler(req, res) {
       ],
       widenedCount: results.filter((r) => r.otherCategory).length,
       period: { start: params.start, end: params.end, days },
-      region: region ? REGIONS[region] : "전국",
+      region: regions.length ? regions.map((r) => REGIONS[r]).join("·") : "전국",
       typeName: type.name,
       categories: cats.map((c) => CATEGORY_NAMES[c] || c),
       errors,

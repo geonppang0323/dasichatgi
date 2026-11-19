@@ -19,7 +19,7 @@ function buildPrompt(text) {
 - type은 다음 중 하나: ${types}
 - color는 다음 중 하나 또는 "": ${COLORS.join(", ")}
 - region은 다음 중 하나 또는 "": ${regions}. 역 이름·동네 이름이면 해당 시도를 골라 (예: 서면역 → LCT000, 사상 → LCT000).
-- 버스·기차·비행기로 여러 지역을 오가다 잃어버렸거나 지역이 두 곳 이상 나오면 region은 ""(전국)로 두고 place에 "부산→서울"처럼 적어.
+- 버스·기차·비행기로 여러 지역을 오가다 잃어버렸거나 지역이 두 곳 이상 나오면 region에 코드를 쉼표로 이어 적고(최대 3개, 예: "LCR000,LCT000"), place에 "대구→부산역"처럼 적어.
 - days는 "어제"면 2, "오늘"이면 1, "지난주"면 10처럼 여유를 조금 둬.
 사용자 문장: """${text}"""`;
 }
@@ -115,8 +115,8 @@ function ruleParse(text) {
   let region = "", place = "";
   if (codes.length === 1) { region = codes[0]; place = found[0].name; }
   else if (codes.length > 1) {
-    // 여러 지역을 오갔으면 어디서 잃어버렸는지 모르므로 전국으로
-    region = "";
+    // 여러 지역을 오갔으면 그 지역들을 모두 검색 (최대 3곳, 그보다 많으면 전국)
+    region = codes.length <= 3 ? codes.join(",") : "";
     place = codes.map((c) => found.find((f) => f.code === c).name).join("→");
   }
   return { type, words, color, days, region, place };
@@ -128,7 +128,7 @@ function clean(out) {
     words: Array.isArray(out.words) ? out.words.map(String).filter(Boolean).slice(0, 4) : [],
     color: COLORS.includes(out.color) ? out.color : "",
     days: Math.min(Math.max(parseInt(out.days, 10) || 7, 1), 30),
-    region: REGIONS[out.region] ? out.region : "",
+    region: [...new Set(String(out.region || "").split(",").map((r) => r.trim()).filter((r) => REGIONS[r]))].slice(0, 3).join(","),
     place: typeof out.place === "string" ? out.place.slice(0, 30) : "",
   };
 }
