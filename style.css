@@ -244,3 +244,148 @@ input[type="text"]:focus, select:focus { outline: 2px solid var(--accent); borde
   .seg { grid-template-columns: repeat(3, 1fr); }
   .row { grid-template-columns: 1fr; }
 }
+
+
+/* =====================================================================
+   테마: 유실물 보관소 — 종이 장부 + 보관 꼬리표(태그) + 안전 주황
+   (이 아래만 지우면 이전 디자인으로 돌아감)
+   ===================================================================== */
+:root {
+  --bg: #efe9dd;
+  --card: #fbf8f1;
+  --text: #1b2433;
+  --muted: #5d6270;
+  --line: #1b2433;
+  --soft-line: #d8cfbd;
+  --accent: #e4570f;
+  --accent-soft: #fde8db;
+  --ink: #1b2433;
+  --warn: #9a3d06;
+  --warn-soft: #fff1d6;
+  --ok: #1f6b45;
+  --ok-soft: #e3f0e6;
+  --radius: 6px;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+body {
+  font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(27,36,51,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27,36,51,.045) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 제목: 보관소 간판 */
+.top h1 {
+  font-family: "Black Han Sans", sans-serif; font-weight: 400;
+  color: var(--ink); letter-spacing: 0; font-size: 34px; line-height: 1.1;
+}
+.top h1::before {
+  content: "LOST & FOUND · 습득물 통합검색";
+  display: block; width: max-content; margin-bottom: 8px;
+  font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+  color: #fff; background: var(--accent); padding: 3px 8px; border-radius: 2px;
+}
+.top h1::after { content: "."; color: var(--accent); }
+.sub { color: var(--muted); }
+
+/* 카드: 장부 용지 */
+.card {
+  background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--radius);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.card h2 { font-size: 18px; display: flex; align-items: center; gap: 8px; }
+#sentence-box h2::before, #manual-box h2::before {
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--ink); border-radius: 2px; padding: 0 5px; line-height: 20px;
+}
+#sentence-box h2::before { content: "A"; background: var(--accent); color: #fff; border-color: var(--accent); }
+#manual-box h2::before { content: "B"; }
+.label { font-size: 14px; letter-spacing: .2px; }
+
+/* 입력칸 */
+input[type="text"], select { border: 1.5px solid var(--soft-line); border-radius: 4px; background: #fff; }
+input[type="text"]:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+/* 버튼 */
+.btn { border-radius: 4px; border: 1.5px solid var(--ink); background: #fff; }
+.btn.primary {
+  background: var(--accent); border-color: var(--ink); color: #fff;
+  box-shadow: 2px 2px 0 var(--ink); transition: transform .05s, box-shadow .05s;
+}
+.btn.primary:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+
+/* 물건 종류: 보관함 칸 */
+.type-btn { border: 1.5px solid var(--soft-line); border-radius: 4px; background: #fff; }
+.type-btn .ico { filter: grayscale(1) contrast(1.1); opacity: .75; }
+.type-btn:hover { border-color: var(--ink); }
+.type-btn[aria-checked="true"] {
+  border: 1.5px solid var(--ink); background: var(--ink); color: #fff;
+}
+.type-btn[aria-checked="true"] .ico { filter: none; opacity: 1; }
+
+.seg button { border: 1.5px solid var(--soft-line); border-radius: 4px; }
+.seg button[aria-checked="true"] { border: 1.5px solid var(--ink); background: var(--ink); color: #fff; }
+.check input { accent-color: var(--accent); }
+.check em { color: var(--accent); }
+
+/* 칩: 고무 도장 */
+.chip {
+  border-radius: 3px; background: transparent; border: 1.5px solid currentColor;
+  color: var(--ink); font-weight: 600; padding: 2px 8px;
+}
+.chip.gray { color: var(--muted); background: transparent; }
+.chip.warn { color: var(--accent); background: transparent; }
+.chip.ok { color: var(--ok); background: transparent; }
+#ai-chips .chip:not(.ok):not(.warn) { background: var(--ink); color: #fff; border-color: var(--ink); }
+.chip-btn { background: var(--ok-soft) !important; }
+
+/* 결과 제목 */
+.summary h2, .results .summary h2 { font-family: "Black Han Sans", sans-serif; font-weight: 400; letter-spacing: .2px; }
+.summary p { font-family: var(--mono); font-size: 13px; }
+
+/* 결과 카드: 보관 꼬리표 */
+.item {
+  position: relative; border: 1.5px solid var(--ink); border-radius: 4px 14px 14px 4px;
+  background: var(--card); padding-left: 34px; box-shadow: 2px 2px 0 var(--soft-line);
+}
+.item::before { /* 끈 구멍 */
+  content: ""; position: absolute; left: 11px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+  border-radius: 50%; background: var(--bg); border: 1.5px solid var(--ink);
+}
+.item::after { /* 절취선 */
+  content: ""; position: absolute; left: 30px; top: 10px; bottom: 10px; border-left: 1.5px dashed var(--soft-line);
+}
+.item:hover { border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent); }
+.thumb { border-radius: 3px; background: #ece5d6; }
+.thumb { filter: grayscale(1); }
+.thumb img { filter: none; }
+.item h3 { font-size: 17px; }
+.item .meta { font-size: 13.5px; }
+
+/* 놓칠 뻔한 물건 배너 · 정렬 */
+.miss { background: var(--warn-soft); border: 1.5px solid var(--ink); border-radius: 4px; border-left: 6px solid var(--accent); }
+.miss p { color: var(--ink); }
+.miss strong { color: var(--accent); }
+.miss .btn { border-color: var(--ink); color: var(--ink); background: #fff; }
+.sort { background: transparent; border: 1.5px solid var(--ink); border-radius: 4px; }
+.sort button { border-radius: 2px; }
+.sort button[aria-checked="true"] { background: var(--ink); color: #fff; box-shadow: none; }
+.notice { background: var(--warn-soft); border: 1.5px dashed var(--accent); color: var(--warn); border-radius: 4px; }
+
+/* 빈 결과 · 첫 화면 */
+.empty { border: 1.5px solid var(--ink); border-radius: 4px; background: var(--card); }
+.welcome { border: 1.5px dashed var(--ink); border-radius: 6px; background: rgba(251,248,241,.8); }
+.welcome strong { color: var(--accent); }
+
+/* 페이지 번호 */
+.pager button { border: 1.5px solid var(--ink); border-radius: 4px; font-family: var(--mono); }
+.pager button[aria-current="page"] { background: var(--ink); border-color: var(--ink); }
+.pager button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+/* 상세 시트 */
+.sheet { border-radius: 8px; border: 1.5px solid var(--ink); background: var(--card); box-shadow: 5px 5px 0 var(--ink); }
+.dl dd { font-weight: 600; }
+.notice-text { background: #f2ecdf; border-left: 3px solid var(--soft-line); border-radius: 2px; }
+.foot a { color: var(--accent); }
