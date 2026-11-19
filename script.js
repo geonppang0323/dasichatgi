@@ -93,21 +93,35 @@ function renderSelects() {
 $("type-grid").addEventListener("click", (e) => {
   const b = e.target.closest("[data-type]");
   if (!b) return;
+  // 물건을 바꾸면 이전 물건 이름은 맞지 않으므로 비운다
+  if (state.type !== b.dataset.type) { state.words = ""; $("words").value = ""; }
   state.type = b.dataset.type;
   renderTypes();
+  clearAi();
 });
 $("day-buttons").addEventListener("click", (e) => {
   const b = e.target.closest("[data-days]");
   if (!b) return;
   state.days = Number(b.dataset.days);
   renderDays();
+  clearAi();
 });
 $("region").addEventListener("change", (e) => {
   state.region = e.target.value;
   try { localStorage.setItem("dasichatgi.region", state.region); } catch (_) {}
+  clearAi();
 });
-$("color").addEventListener("change", (e) => { state.color = e.target.value; });
-$("words").addEventListener("input", (e) => { state.words = e.target.value; });
+$("color").addEventListener("change", (e) => { state.color = e.target.value; clearAi(); });
+$("words").addEventListener("input", (e) => { state.words = e.target.value; clearAi(); });
+
+// 직접 고르기 시작하면 이전 문장 해석(칩·안내)은 더 이상 맞지 않으므로 지운다
+function clearAi() {
+  if ($("ai-chips").hidden) return;
+  $("ai-chips").hidden = true;
+  $("sentence-msg").textContent = "";
+  $("sentence-msg").className = "hint";
+  $("sentence").value = "";
+}
 $("widen").addEventListener("change", (e) => { state.widen = e.target.checked; });
 $("search-btn").addEventListener("click", () => search());
 
