@@ -1,0 +1,13 @@
+{
+  "name": "dasichatgi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "다시찾기 - 분류가 다르게 등록된 습득물까지 넓혀 찾는 분실물 검색 웹앱",
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "node dev-server.mjs"
+  }
+}

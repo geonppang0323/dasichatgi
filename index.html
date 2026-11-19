@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>다시찾기 - 잃어버린 물건 찾기</title>
+  <meta name="description" content="분류가 다르게 등록된 습득물까지 넓혀서 찾아주는 분실물 검색 웹앱">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="layout">
+    <div class="side">
+    <header class="top">
+      <h1>다시찾기</h1>
+      <p class="sub">경찰서와 지하철·상점에 맡겨진 물건을 한 번에 찾아요</p>
+    </header>
+    <!-- 1. 문장으로 찾기 -->
+    <section class="card" id="sentence-box">
+      <h2>어떻게 잃어버렸나요?</h2>
+      <form id="sentence-form" class="sentence">
+        <input id="sentence" type="text" maxlength="300"
+               placeholder="예: 어제 서면역에서 흰색 에어팟 잃어버렸어" autocomplete="off">
+        <button type="submit" class="btn primary">찾기</button>
+      </form>
+      <p id="sentence-msg" class="hint" aria-live="polite"></p>
+      <div id="ai-chips" class="chips" hidden></div>
+    </section>
+
+    <!-- 2. 버튼으로 고르기 -->
+    <section class="card" id="manual-box">
+      <h2>또는 직접 골라 주세요</h2>
+
+      <p class="label">무엇을 잃어버렸나요?</p>
+      <div id="type-grid" class="type-grid" role="radiogroup" aria-label="물건 종류"></div>
+
+      <p class="label">언제 잃어버렸나요?</p>
+      <div id="day-buttons" class="seg" role="radiogroup" aria-label="기간"></div>
+
+      <div class="row">
+        <label class="field">
+          <span class="label">어디서?</span>
+          <select id="region"></select>
+        </label>
+        <label class="field">
+          <span class="label">색상 (선택)</span>
+          <select id="color"><option value="">상관없음</option></select>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="label">물건 이름 (선택)</span>
+        <input id="words" type="text" placeholder="예: 에어팟, 버즈, 카드지갑" autocomplete="off">
+      </label>
+
+      <label class="check">
+        <input id="widen" type="checkbox" checked>
+        <span>다른 분류로 등록된 물건까지 넓혀 찾기 <em>(추천)</em></span>
+      </label>
+
+      <button id="search-btn" class="btn primary wide">찾기</button>
+    </section>
+    </div>
+
+    <!-- 3. 결과 -->
+    <section id="results" class="results" aria-live="polite">
+      <div class="welcome">
+        <h2>잃어버린 물건, 다른 이름으로 맡겨져 있을 수도 있어요</h2>
+        <p>습득물은 맡긴 사람마다 분류를 다르게 등록해요. 예를 들어 카드지갑이 '지갑'이 아니라 '기타물품'으로 올라가기도 해요.</p>
+        <p>다시찾기는 <strong>관련 분류까지 넓혀서</strong> 찾고, 말씀하신 특징이 <strong>많이 맞는 물건부터</strong> 보여드려요.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 상세 -->
+  <dialog id="detail" class="sheet">
+    <div id="detail-body"></div>
+    <button class="btn wide" id="detail-close">닫기</button>
+  </dialog>
+
+  <footer class="foot">
+    <p>데이터: 경찰청 습득물정보·포털기관 습득물정보 조회 서비스 (공공데이터포털, 하루 1회 갱신)</p>
+    <p id="fetched-at"></p>
+    <p>급하게 연락이 필요하면 <a href="https://minwon24.police.go.kr" target="_blank" rel="noopener">경찰민원24</a>에서도 확인할 수 있어요.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
