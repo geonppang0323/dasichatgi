@@ -20,7 +20,7 @@ function buildPrompt(text) {
 - color는 다음 중 하나 또는 "": ${COLORS.join(", ")}
 - region은 다음 중 하나 또는 "": ${regions}. 역 이름·동네 이름이면 해당 시도를 골라 (예: 서면역 → LCT000, 사상 → LCT000).
 - 버스·기차·비행기로 여러 지역을 오가다 잃어버렸거나 지역이 두 곳 이상 나오면 region에 코드를 쉼표로 이어 적고(최대 3개, 예: "LCR000,LCT000"), place에 "대구→부산역"처럼 적어.
-- 물건이 여러 개면 첫 번째를 type에, 나머지 종류 키를 others에 넣어.
+- 물건이 여러 개면 첫 번째를 type에, 나머지 종류 키를 others에 넣어. words에는 type 물건의 단어만 넣고 others 물건의 단어는 넣지 마.
 - "검은색은 아니고 흰색", "에어팟 말고 버즈"처럼 부정한 것은 빼고 최종 값만 써.
 - 30일보다 오래전이면 days는 30으로 두고 note에 "최대 30일까지만 찾을 수 있어요"라고 적어.
 - days는 "어제"면 2, "오늘"이면 1, "지난주"면 10처럼 여유를 조금 둬.
@@ -157,6 +157,10 @@ function ruleParse(text) {
 }
 
 function clean(out) {
+  // 함께 잃어버린 다른 물건의 단어는 이번 검색어에서 뺀다 (예: 이어폰 검색에 '지갑'이 섞이지 않게)
+  const others = Array.isArray(out.others) ? out.others.filter((k) => TYPES[k] && k !== out.type) : [];
+  const otherWords = others.flatMap((k) => [...TYPES[k].words, TYPES[k].name]);
+  if (Array.isArray(out.words)) out.words = out.words.filter((w) => !otherWords.some((o) => String(w).includes(o) || o.includes(String(w))));
   return {
     type: TYPES[out.type] ? out.type : "etc",
     words: Array.isArray(out.words) ? out.words.map(String).filter(Boolean).slice(0, 4) : [],
