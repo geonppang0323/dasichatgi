@@ -157,8 +157,16 @@ function showAiChips(d) {
     `지역: ${region}${d.place ? ` (${d.place})` : ""}`,
   ].filter(Boolean);
   const box = $("ai-chips");
-  box.innerHTML = chips.map((c) => `<span class="chip">${esc(c)}</span>`).join("");
+  box.innerHTML = chips.map((c) => `<span class="chip">${esc(c)}</span>`).join("")
+    + (d.note ? `<span class="chip warn">${esc(d.note)}</span>` : "")
+    + (d.others || []).map((k) => `<button type="button" class="chip ok chip-btn" data-other="${esc(k)}">${esc(NAME[k] || k)}도 찾기 →</button>`).join("");
   box.hidden = false;
+  box.querySelectorAll("[data-other]").forEach((b) => b.addEventListener("click", () => {
+    const k = b.dataset.other;
+    search({ type: k, words: "" });
+    // 칩도 새 물건 기준으로 바꾸고, 원래 물건으로 돌아갈 버튼을 남긴다
+    showAiChips({ ...d, type: k, words: [], others: [d.type, ...(d.others || []).filter((o) => o !== k)] });
+  }));
 }
 
 // ---------- 검색 ----------

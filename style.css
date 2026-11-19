@@ -107,6 +107,7 @@ input[type="text"]:focus, select:focus { outline: 2px solid var(--accent); borde
 .chip.gray { background: #eef0f3; color: var(--muted); }
 .chip.warn { background: var(--warn-soft); color: var(--warn); }
 .chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip-btn { border: 1px solid #b6e3c9; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 
 /* 결과 */
 .results { margin-bottom: 24px; }
